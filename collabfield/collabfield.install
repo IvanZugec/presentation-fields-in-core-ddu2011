@@ -1,0 +1,51 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_install().
+ */
+function collabfield_install() {
+
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function collabfield_uninstall() {
+
+}
+
+/**
+ * Implementation of hook_field_schema().
+ */
+function collabfield_field_schema($field) {
+
+  if ($field['type'] == 'collabfield') {
+
+    $schema['columns']['name'] = array(
+      'type' => 'varchar',
+      'length' => '255',
+      'not null' => FALSE,
+    );
+
+    $schema['columns']['role'] = array(
+      'type' => 'varchar',
+      'length' => '255',
+      'not null' => FALSE,
+    );
+
+    $schema['columns']['link'] = array(
+      'type' => 'varchar',
+      'length' => '255',
+      'not null' => FALSE,
+    );
+
+    $schema['indexes'] = array(
+      'name' => array('name'),
+      'role' => array('role'),
+      'link' => array('link'),
+    );
+
+    return $schema;
+  }
+}

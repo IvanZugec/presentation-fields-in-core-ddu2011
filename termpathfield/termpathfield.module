@@ -1,0 +1,78 @@
+<?php
+// $Id$
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function termpathfield_field_formatter_info() {
+  return array(
+    'termpathfield_term_reference_link' => array(
+      'label' => t('Custom path link'),
+      'field types' => array('taxonomy_term_reference'),
+      'settings' =>  array(
+        'taxonomy_custom_url' => 'taxonomy/term/[tid]',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function termpathfield_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $form = array();
+
+  if ($display['type'] == 'termpathfield_term_reference_link') {
+    $form['taxonomy_custom_url'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Custom term page URL'),
+      '#default_value' => $settings['taxonomy_custom_url'],
+      '#required' => TRUE,
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function termpathfield_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary = '';
+
+  if ($display['type'] == 'termpathfield_term_reference_link') {
+    $summary = $settings['taxonomy_custom_url'];
+  }
+
+  return $summary;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function termpathfield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $result = array();
+  
+  switch ($display['type']) {
+    case 'termpathfield_term_reference_link':
+      foreach ($items as $delta => $item) {
+        $term = taxonomy_term_load($item['tid']);
+        
+        $uri_path = str_replace('[tid]', $term->tid, $display['settings']['taxonomy_custom_url']);
+        $uri = url($uri_path, array('absolute' => TRUE));
+
+        $result[$delta] = array(
+          '#type' => 'link',
+          '#title' => $term->name,
+          '#href' => $uri,
+        );
+      }
+    break;
+  }
+
+  return $result;
+}

@@ -1,0 +1,9 @@
+; $Id$
+
+name = Term Path field
+description = Custom taxonomy formatter
+
+dependencies[] = field_ui
+dependencies[] = taxonomy
+
+core = 7.x

@@ -1,0 +1,159 @@
+<?php
+// $Id$
+
+
+/**
+ * Implementation of hook_field_info().
+ */
+function collabfield_field_info() {
+  return array(
+    'collabfield' => array(
+      'label' => t('Collaborator'),
+      'description' => t('Custom collaborators field.'),
+      'default_widget' => 'collabfield_collabfield_form',
+      'default_formatter' => 'collabfield_default',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function collabfield_field_widget_info() {
+  return array(
+    'collabfield_collabfield_form' => array(
+      'label' => t('Collabfield form'),
+      'field types' => array('collabfield'),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+        //Use FIELD_BEHAVIOR_NONE for no default value.
+        'default value' => FIELD_BEHAVIOR_DEFAULT,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function collabfield_field_formatter_info() {
+  return array(
+    'collabfield_default' => array(
+      'label' => t('Default'),
+      'field types' => array('collabfield'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function collabfield_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+
+  switch ($display['type']) {
+    case 'collabfield_default':
+      foreach ($items as $delta => $item) {
+        $element[$delta]['#markup'] = theme('collabfield_formatter_default', $item);
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implementation of hook_field_is_empty().
+ */
+function collabfield_field_is_empty($item, $field) {
+  if ($field['type'] == 'collabfield') {
+  
+    if (empty($item['name']) && empty($item['role']) && empty($item['link'])) {
+     return TRUE;
+	}
+	 
+  }
+  return FALSE;
+}
+
+/**
+ * Implementation of hook_field_settings_form().
+ */
+function collabfield_field_settings_form($field, $instance, $has_data) {
+  if ($field['type'] == 'collabfield') {
+    $settings = $field['settings'];
+    $form = array();
+    return $form;
+  }
+}
+
+/**
+ * Implementation of hook_field_validate().
+ */
+function collabfield_field_validate($obj_type, $object, $field, $instance, $langcode, &$items, &$errors) {
+  if ($field['type'] == 'collabfield') {
+
+  }
+}
+
+
+/**
+ * Implementation of hook_field_widget_form().
+ */
+function collabfield_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $base = $element;
+  if ($instance['widget']['type'] == 'collabfield_collabfield_form') {
+    $widget = $instance['widget'];
+    $settings = $widget['settings'];
+    
+    $element['name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Name'),
+      '#default_value' => isset($items[$delta]['name']) ? $items[$delta]['name'] : NULL,
+    );
+    $element['role'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Role'),
+      '#default_value' => isset($items[$delta]['role']) ? $items[$delta]['role'] : NULL,
+    );
+    $element['link'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Link'),
+      '#default_value' => isset($items[$delta]['link']) ? $items[$delta]['link'] : NULL,
+      '#element_validate' => array('_collabfield_link_validate'),
+    );
+
+  }
+  return $element;
+}
+
+/**
+ * Validation callback for a collabfield link element.
+ */
+function _collabfield_link_validate($element, &$form_state, $form) {
+  $value = $element['#value'];
+  if (!empty($value) && !valid_url($value, TRUE)) {
+    form_error($element, t('Invalid URL.'));
+  }
+}
+
+function collabfield_theme($existing, $type, $theme, $path) {
+  return array(
+    'collabfield_formatter_default' => array(
+      'variables' => array('item' => NULL),
+    ),
+  );
+}
+
+
+function theme_collabfield_formatter_default($item) {
+  
+  $output = '';
+  $output .= '<div class="collabfield-wrapper">';
+  $output .= 'Name: ' . $item['name'] . "<br>";
+  $output .= 'Role: ' . $item['role'] . "<br>";
+  $output .= 'Link: ' . l($item['link'], $item['link'], array('options' =>  array('absolute' => TRUE)));
+  $output .= '</div><br />';
+
+  return $output;
+}
