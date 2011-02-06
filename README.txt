@@ -2,5 +2,4 @@ This is the example code used in the "Fields in Core: How to create a custom fie
 
 Presentation slide can be found at: http://www.slideshare.net/zugec/fields-in-core-how-to-create-a-custom-field
 
-
-Understand that this is only example code. Please review for any secrity issues.
+Example code only, please review for any security issues.
